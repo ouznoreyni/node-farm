@@ -1,4 +1,5 @@
 const http = require('http')
+const url = require('url')
 const fs = require('fs')
 
 
@@ -30,10 +31,9 @@ const replaceTemplate = (temp, product)=>{
 
 
 const server = http.createServer((req, res)=>{
-  const pathName = req.url;
-
+  const {query, pathname} = url.parse(req.url, true);
   //overview page
-  if (pathName=='/'|| pathName=='/overview') {
+  if (pathname=='/'|| pathname=='/overview') {
   res.writeHead(200, {"Content-type": "text/html"})
 
   const cardsHTML = dataObj.map(el=>{
@@ -45,11 +45,14 @@ const server = http.createServer((req, res)=>{
     res.end(output)    
   }
   //product page
-  else if(pathName == '/product'){
-    res.end('product')
+  else if(pathname == '/product'){
+  res.writeHead(200, {"Content-type": "text/html"})
+    const product = dataObj[query.id];
+    const output = replaceTemplate(templateProduct, product)
+    res.end(output)
   }
   //api
-  else if (pathName =='/api') {
+  else if (pathname =='/api') {
   
       res.writeHead(200, {"Content-type": "application/json"})
       res.end(data)
